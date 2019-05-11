@@ -1,4 +1,5 @@
 # BloggerApp
+This is a blogger app created using Angular 7, .NET Core 2.2 & SQL Server. Users are able to view a list of different blog posts on a number of different categories. They also have the option to sign up and start liking posts as well as creating posts of their own.
 
 #### Project Setup
 
