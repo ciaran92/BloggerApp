@@ -1,6 +1,6 @@
-#BloggerApp
+# BloggerApp
 
-####Project Setup
+#### Project Setup
 
 .1 **Create Database and run the following script to set up the tables that will be needed**
 
