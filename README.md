@@ -61,6 +61,17 @@ create table Article
 )
 go
 
+drop table if exists RefreshToken
+create table RefreshToken
+(
+	Id int primary key identity(1,1) not null,
+	IssuedUtc datetime,
+	ExpiresUtc datetime,
+	Token varchar(450),
+	AppUserId int,
+	foreign key (AppUserId) references AppUser(AppUserId)
+)
+
 ```
 
 #### Integration Tests:
