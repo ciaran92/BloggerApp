@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.421
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BloggerApp", "BloggerApp\BloggerApp.csproj", "{2BEF8C5C-6643-4578-85FB-F17387A8F611}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BloggerApp", "BloggerApp\BloggerApp.csproj", "{2BEF8C5C-6643-4578-85FB-F17387A8F611}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BloggerApp.Core", "BloggerApp.Core\BloggerApp.Core.csproj", "{97D4C5EA-4EEE-4964-AA92-DD3A77585669}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BloggerApp.Core", "BloggerApp.Core\BloggerApp.Core.csproj", "{97D4C5EA-4EEE-4964-AA92-DD3A77585669}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BloggerApp.Data", "BloggerApp.Data\BloggerApp.Data.csproj", "{6E6EF96F-57E5-4535-A5CA-326D40051930}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BloggerApp.Data", "BloggerApp.Data\BloggerApp.Data.csproj", "{6E6EF96F-57E5-4535-A5CA-326D40051930}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BloggerApp.IntegrationTesting", "BloggerApp.IntegrationTesting\BloggerApp.IntegrationTesting.csproj", "{6ADD94B0-1E70-4AA9-93B1-90B6663240E9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{6E6EF96F-57E5-4535-A5CA-326D40051930}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E6EF96F-57E5-4535-A5CA-326D40051930}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E6EF96F-57E5-4535-A5CA-326D40051930}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6ADD94B0-1E70-4AA9-93B1-90B6663240E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6ADD94B0-1E70-4AA9-93B1-90B6663240E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6ADD94B0-1E70-4AA9-93B1-90B6663240E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6ADD94B0-1E70-4AA9-93B1-90B6663240E9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

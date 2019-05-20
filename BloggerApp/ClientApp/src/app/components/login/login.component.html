@@ -1,0 +1,31 @@
+<div class="card">
+    <article class="card-body">
+        <h4 class="card-title text-center mb-4 mt-1">Sign in</h4>
+        <span *ngIf="error" class="error">{{error}}</span>
+        <form #loginForm="ngForm" (ngSubmit)="login(loginForm)">
+            <div class="form-group">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"> <i class="fa fa-user"></i> </span>
+                    </div>
+                    <input class="form-control" placeholder="Email" type="email" name="Email" #Email ngModel>
+                </div> <!-- input-group.// -->
+            </div> <!-- form-group// -->
+
+            <div class="form-group">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+                    </div>
+                    <input class="form-control" placeholder="******" type="password" name="UserPassword" #UserPassword ngModel>
+                </div> <!-- input-group.// -->
+              </div> <!-- form-group// -->
+        
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+            </div> <!-- form-group// -->
+        
+            <p class="text-center"><a href="#" class="btn">Forgot password?</a></p>
+        </form>
+    </article>
+</div> <!-- card.// -->

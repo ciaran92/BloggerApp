@@ -12,9 +12,9 @@ namespace BloggerApp.Controllers
     {
         // GET api/values
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public async Task <ActionResult> Get()
         {
-            return new string[] { "value1", "value2" };
+            return Ok();
         }
 
         // GET api/values/5
