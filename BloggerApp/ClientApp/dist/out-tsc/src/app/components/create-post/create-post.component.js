@@ -9,11 +9,13 @@ var CreatePostComponent = /** @class */ (function () {
         var _this = this;
         this.articleService.getAllCategories().subscribe(function (response) {
             _this.categories = response;
-            console.log(_this.categories[0]);
+            _this.categorySelected = _this.categories[0].categoryId;
         });
     };
     CreatePostComponent.prototype.createNewPost = function (articleTitle, articleBody) {
-        console.log(articleTitle + ", " + articleBody + ", " + this.categoryId);
+        this.articleService.createNewPost(articleTitle, articleBody, this.categorySelected).subscribe(function (result) {
+            console.log(result);
+        });
     };
     CreatePostComponent.prototype.getCategoryId = function (event) {
         this.categoryId = event.target.value;

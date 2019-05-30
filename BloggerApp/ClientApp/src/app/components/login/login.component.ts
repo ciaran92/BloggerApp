@@ -18,6 +18,7 @@ export class LoginComponent implements OnInit {
   }
 
   login(form: NgForm) {
+    console.log("called");
     let loginCredentials = JSON.stringify(form.value);
     this.authService.login(loginCredentials).subscribe(result => {
       if(result) {

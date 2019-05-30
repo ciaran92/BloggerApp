@@ -15,11 +15,11 @@ import { RegisterComponent } from './components/register/register.component';
 import { ConfigService } from './services/config.service';
 import { UserService } from './services/user.service';
 import { ArticleService } from './services/article.service';
-import { PostsComponent } from './components/posts/posts.component';
 import { CookieService } from 'ngx-cookie-service';
 import { CreatePostComponent } from './components/create-post/create-post.component';
 import { AuthService } from './services/auth.service';
 import { AppInterceptorService } from './services/app-interceptor.service';
+import { ArticlesComponent } from './components/articles/articles.component';
 
 @NgModule({
   declarations: [
@@ -28,8 +28,8 @@ import { AppInterceptorService } from './services/app-interceptor.service';
     HomeComponent,
     LoginComponent,
     RegisterComponent,
-    PostsComponent,
-    CreatePostComponent
+    CreatePostComponent,
+    ArticlesComponent
   ],
 
   imports: [
@@ -45,7 +45,11 @@ import { AppInterceptorService } from './services/app-interceptor.service';
     CookieService, 
     ArticleService, 
     AuthService,
-    AppInterceptorService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AppInterceptorService,
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })

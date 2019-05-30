@@ -10,5 +10,6 @@ namespace BloggerApp.Core.Services.Categories
     public interface ICategoryService
     {
         Task<List<ArticleCategoryDto>> GetAllCategories();
+        Task<bool> ArticleCategoryExists(int categoryId);
     }
 }

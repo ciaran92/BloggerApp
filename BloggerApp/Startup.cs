@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BloggerApp.ConfigureServices;
 using BloggerApp.Data.Context;
 using BloggerApp.Data.Entities;
 using BloggerApp.Data.Models;
 using BloggerApp.Data.Models.AppUser;
+using BloggerApp.Data.Models.Article;
 using BloggerApp.Data.Models.ArticleCategory;
 using BloggerApp.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -36,7 +38,14 @@ namespace BloggerApp
         public void ConfigureServices(IServiceCollection services)
         {
             //services.AddDbContext<TestDBContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddJsonOptions(
+                options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );
+
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
 
             // Get information from the app settings and make use of it
             var appSettingsSection = Configuration.GetSection("AppSecrets");
@@ -44,36 +53,14 @@ namespace BloggerApp
             var appSettings = appSettingsSection.Get<AppSecrets>();
 
             string connection = appSettings.ConnectionString;
-            services.AddDbContext<TestDBContext>(options => options.UseSqlServer(connection));
+
+            //services.AddDbContext<TestDBContext>(options => options.UseSqlServer(connection));
+            services.AddDbContext<TestDBContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:DefaultConnection"]));
 
             var key = Encoding.UTF8.GetBytes(appSettings.Secret);
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters()
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = "http://localhost:52459",
-                    ValidAudience = "http://localhost:52459",
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero,
-                    IssuerSigningKey = new SymmetricSecurityKey(key)
-                };
-            });
-
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAll", p =>
-                {
-                    p.AllowAnyOrigin()
-                    .AllowAnyHeader()
-                    .AllowAnyMethod();
-                });
-            });
-
             DependencyInjectionConfig.AddScope(services);
+            JwtConfig.AddJwtAuthentication(services, Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -93,6 +80,10 @@ namespace BloggerApp
             {
                 cfg.CreateMap<UserForCreationDto, AppUser>();
                 cfg.CreateMap<ArticleCategory, ArticleCategoryDto>();
+                cfg.CreateMap<ArticleForCreationDto, Article>();
+                cfg.CreateMap<Article, ArticleDto>()
+                    .ForMember(a => a.FirstName, ex => ex.MapFrom(o => o.Author.FirstName))
+                    .ForMember(a => a.LastName, ex => ex.MapFrom(o => o.Author.LastName));
             });
             //app.ConfigureCustomExceptionMiddleware();
             app.UseCors("AllowAll");

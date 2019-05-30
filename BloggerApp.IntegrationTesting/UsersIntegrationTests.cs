@@ -1,4 +1,5 @@
 using BloggerApp.Data.Models;
+using BloggerApp.Data.Models.AppUser;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
@@ -21,7 +22,7 @@ namespace BloggerApp.IntegrationTesting
             _client = fixture.Client;
         }
 
-        [Fact]
+        /*[Fact]
         public async Task Test1()
         {
             var request = "/api/values";
@@ -31,21 +32,20 @@ namespace BloggerApp.IntegrationTesting
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             //Assert.Equal(1, 1);
-        }
+        }*/
 
         [Fact]
-        public async Task TestRegisterNewUser()
+        public async Task TestRegisterNewUserSuccessful()
         {
-
             var response = await _client.PostAsync("/api/users/register", new StringContent(
                     JsonConvert.SerializeObject(
                     new UserForCreationDto()
                     {
-                        FirstName = "Test FName1",
-                        LastName = "Test LName1",
-                        UserName = "Test UsrName1",
-                        UserPassword = "Password",
-                        Email = "Test@email.com"
+                        FirstName = "Test",
+                        LastName = "User",
+                        UserName = "TestUser",
+                        UserPassword = "testing123",
+                        Email = "test@email.com"
                     }), Encoding.UTF8, "application/json")
                 );
 
@@ -54,6 +54,75 @@ namespace BloggerApp.IntegrationTesting
             // Assert
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task TestRegisterNewUserEmailAlreadyExists()
+        {
+            var response = await _client.PostAsync("/api/users/register", new StringContent(
+                    JsonConvert.SerializeObject(
+                    new UserForCreationDto()
+                    {
+                        FirstName = "Test",
+                        LastName = "User",
+                        UserName = "TestUser",
+                        UserPassword = "testing123",
+                        Email = "Harry@gmail.com"
+                    }), Encoding.UTF8, "application/json")
+                );
+
+            //var value = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task TestLoginUserCorrectCredentials()
+        {
+            var response = await _client.PostAsync("/api/users/login", new StringContent(
+                JsonConvert.SerializeObject(
+                    new UserLoginDto()
+                    {
+                        Email = "Harry@gmail.com",
+                        UserPassword = "roflcopter69"
+                    }), Encoding.UTF8, "application/json")
+                );
+
+            response.EnsureSuccessStatusCode();
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task TestLoginUserIncorrectPasswordReturnsBadRequest()
+        {
+            var response = await _client.PostAsync("/api/users/login", new StringContent(
+                JsonConvert.SerializeObject(
+                    new UserLoginDto()
+                    {
+                        Email = "Harry@gmail.com",
+                        UserPassword = "wrongpassword"
+                    }), Encoding.UTF8, "application/json")
+                );
+
+            //response.EnsureSuccessStatusCode();
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task TestLoginUserIncorrectEmailReturnsBadRequest()
+        {
+            var response = await _client.PostAsync("/api/users/login", new StringContent(
+                JsonConvert.SerializeObject(
+                    new UserLoginDto()
+                    {
+                        Email = "incorrect@email.com",
+                        UserPassword = "roflcopter69"
+                    }), Encoding.UTF8, "application/json")
+                );
+
+            //response.EnsureSuccessStatusCode();
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
     }
 }

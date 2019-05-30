@@ -1,7 +1,7 @@
 import * as tslib_1 from "tslib";
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { FormsModule } from '@angular/forms';
 // Components
@@ -14,11 +14,11 @@ import { RegisterComponent } from './components/register/register.component';
 import { ConfigService } from './services/config.service';
 import { UserService } from './services/user.service';
 import { ArticleService } from './services/article.service';
-import { PostsComponent } from './components/posts/posts.component';
 import { CookieService } from 'ngx-cookie-service';
 import { CreatePostComponent } from './components/create-post/create-post.component';
 import { AuthService } from './services/auth.service';
 import { AppInterceptorService } from './services/app-interceptor.service';
+import { ArticlesComponent } from './components/articles/articles.component';
 var AppModule = /** @class */ (function () {
     function AppModule() {
     }
@@ -30,8 +30,8 @@ var AppModule = /** @class */ (function () {
                 HomeComponent,
                 LoginComponent,
                 RegisterComponent,
-                PostsComponent,
-                CreatePostComponent
+                CreatePostComponent,
+                ArticlesComponent
             ],
             imports: [
                 BrowserModule,
@@ -45,7 +45,11 @@ var AppModule = /** @class */ (function () {
                 CookieService,
                 ArticleService,
                 AuthService,
-                AppInterceptorService,
+                {
+                    provide: HTTP_INTERCEPTORS,
+                    useClass: AppInterceptorService,
+                    multi: true
+                }
             ],
             bootstrap: [AppComponent]
         })

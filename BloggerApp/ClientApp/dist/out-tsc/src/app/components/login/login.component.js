@@ -12,6 +12,7 @@ var LoginComponent = /** @class */ (function () {
     };
     LoginComponent.prototype.login = function (form) {
         var _this = this;
+        console.log("called");
         var loginCredentials = JSON.stringify(form.value);
         this.authService.login(loginCredentials).subscribe(function (result) {
             if (result) {

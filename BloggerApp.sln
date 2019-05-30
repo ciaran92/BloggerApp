@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BloggerApp.Core", "BloggerA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BloggerApp.Data", "BloggerApp.Data\BloggerApp.Data.csproj", "{6E6EF96F-57E5-4535-A5CA-326D40051930}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BloggerApp.IntegrationTesting", "BloggerApp.IntegrationTesting\BloggerApp.IntegrationTesting.csproj", "{6ADD94B0-1E70-4AA9-93B1-90B6663240E9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BloggerApp.IntegrationTesting", "BloggerApp.IntegrationTesting\BloggerApp.IntegrationTesting.csproj", "{6ADD94B0-1E70-4AA9-93B1-90B6663240E9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

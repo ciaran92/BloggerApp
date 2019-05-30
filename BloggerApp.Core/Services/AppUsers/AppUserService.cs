@@ -77,9 +77,9 @@ namespace BloggerApp.Core.AppUsers.Services
             return hashedPassword;
         }
 
-        public async Task<bool> UserExists(string username)
+        public async Task<bool> EmailExists(string email)
         {
-            if (await _context.AppUser.SingleOrDefaultAsync(x => x.UserName == username) != null)
+            if (await _context.AppUser.SingleOrDefaultAsync(x => x.Email == email) != null)
             {
                 return true;
             }

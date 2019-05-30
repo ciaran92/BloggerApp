@@ -1,12 +1,16 @@
-﻿using BloggerApp.Data.Entities;
+﻿using BloggerApp.Data.Context;
+using BloggerApp.Data.Entities;
 using BloggerApp.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace BloggerApp.Core.Auth
 {
@@ -14,10 +18,12 @@ namespace BloggerApp.Core.Auth
     public class JwtAuthentication : IJwtAuthentication
     {
         private readonly AppSecrets _appSecrets;
+        private readonly TestDBContext _context;
         private readonly byte[] _secretKey;
 
-        public JwtAuthentication(IOptions<AppSecrets> appSecrets)
+        public JwtAuthentication(TestDBContext context, IOptions<AppSecrets> appSecrets)
         {
+            _context = context;
             _appSecrets = appSecrets.Value;
             _secretKey = Encoding.UTF8.GetBytes(_appSecrets.Secret);
         }
@@ -26,8 +32,8 @@ namespace BloggerApp.Core.Auth
         {
             var claims = new List<Claim>()
             {
-                new Claim(JwtRegisteredClaimNames.NameId, user.AppUserId.ToString()),
-                new Claim(JwtRegisteredClaimNames.UniqueName, user.Email),
+                new Claim(ClaimTypes.Name, user.AppUserId.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
                 new Claim("FName", user.FirstName),
                 new Claim("LName", user.LastName)
             };
@@ -35,15 +41,30 @@ namespace BloggerApp.Core.Auth
             return GetAccessToken(claims);
         }
 
-        public RefreshToken CreateRefreshToken(int appUserId)
+        public RefreshToken CreateRefreshToken(int userId)
         {
-            throw new NotImplementedException();
-        }
+            var refreshToken = _context.RefreshToken.SingleOrDefault(t => t.AppUserId == userId);
+            if (refreshToken != null)
+            {
+                Console.WriteLine("token not null");
+                _context.RefreshToken.Remove(refreshToken);
+                _context.SaveChanges();
+            }
 
-        public RefreshToken GetRefreshToken(int appUserId)
-        {
-            throw new NotImplementedException();
-        }
+            var newRefreshToken = new RefreshToken
+            {
+                AppUserId = userId,
+                Token = Guid.NewGuid().ToString(),
+                IssuedUtc = DateTime.Now,
+                //ExpiresUtc = DateTime.Now.AddHours(1)
+                ExpiresUtc = DateTime.Now.AddHours(6)
+            };
+
+            _context.RefreshToken.Add(newRefreshToken);
+            _context.SaveChanges();
+
+            return newRefreshToken;
+        }     
 
         private string GetAccessToken(IEnumerable<Claim> claims)
         {
@@ -54,12 +75,76 @@ namespace BloggerApp.Core.Auth
             (
                 issuer: "http://localhost:52459",
                 audience: "http://localhost:52459",
-                expires: DateTime.Now.AddMinutes(5),
+                expires: DateTime.Now.AddMinutes(30),
                 claims: claims,
                 signingCredentials: signInCred
             );
             
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        {
+            var key = new SymmetricSecurityKey(_secretKey);
+
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = key,
+                ValidateLifetime = false
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            SecurityToken securityToken;
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
+            var jwtSecurityToken = securityToken as JwtSecurityToken;
+            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            {
+                throw new SecurityTokenException("Invalid token");
+            }
+            return principal;
+        }
+
+        // Method to generate a new access token to client as long as refresh token is still valid
+        public async Task<string> RefreshAccessToken(int userId)
+        {
+            var refreshTokenFromDB = await GetRefreshToken(userId);
+
+            // check if there is a current refresh token for user in database
+            if (refreshTokenFromDB == null)
+            {
+                return null;
+            }
+
+            // check if refresh token has expired.
+            if (refreshTokenFromDB.ExpiresUtc < DateTime.Now)
+            {
+                return null;
+            }
+
+            // if refresh token still valid.. generate a new access token and send back to user
+            var user = await _context.AppUser.SingleOrDefaultAsync(x => x.AppUserId == userId);
+
+            if(user != null)
+            {
+                string newAccessToken = CreateAccessToken(user);
+                return newAccessToken;
+            }
+
+            return null;            
+        }
+
+        public async Task<RefreshToken> GetRefreshToken(int userId)
+        {
+            var refreshTokenFromDB = await _context.RefreshToken.SingleOrDefaultAsync(t => t.AppUserId == userId);
+            return refreshTokenFromDB;
+        }
+
+        public void DeleteRefreshToken(RefreshToken refreshToken)
+        {
+            _context.RefreshToken.Remove(refreshToken);
         }
     }
 }

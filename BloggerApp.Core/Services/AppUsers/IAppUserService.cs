@@ -10,7 +10,7 @@ namespace BloggerApp.Core.Services.AppUsers
     {
         AppUser Register(AppUser user);
         Task<AppUser> Login(string username, string password);
-        Task<bool> UserExists(string username);
+        Task<bool> EmailExists(string email);
         Task<AppUser> Authenticate(string username, string password);
     }
 }
