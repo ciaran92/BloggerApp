@@ -7,6 +7,6 @@ namespace BloggerApp.Core.Services
 {
     public interface IUnitOfWork : IDisposable
     {
-        Task SaveChangesAsync();
+        Task<bool> SaveChangesAsync();
     }
 }

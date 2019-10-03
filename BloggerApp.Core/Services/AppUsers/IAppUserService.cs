@@ -12,5 +12,6 @@ namespace BloggerApp.Core.Services.AppUsers
         Task<AppUser> Login(string username, string password);
         Task<bool> EmailExists(string email);
         Task<AppUser> Authenticate(string username, string password);
+        Task<bool> CheckUserExistsAsync(int userId);
     }
 }

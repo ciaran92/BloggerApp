@@ -9,8 +9,11 @@ using BloggerApp.Data.Entities;
 using BloggerApp.Data.Models;
 using BloggerApp.Data.Models.AppUser;
 using BloggerApp.Data.Models.Article;
+using BloggerApp.Data.Models.Article.Update;
 using BloggerApp.Data.Models.ArticleCategory;
+using BloggerApp.Data.Seed;
 using BloggerApp.Helpers;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -47,24 +50,26 @@ namespace BloggerApp
                 options.SuppressModelStateInvalidFilter = true;
             });
 
-            // Get information from the app settings and make use of it
-            var appSettingsSection = Configuration.GetSection("AppSecrets");
-            services.Configure<AppSecrets>(appSettingsSection);
-            var appSettings = appSettingsSection.Get<AppSecrets>();
-
-            string connection = appSettings.ConnectionString;
-
             //services.AddDbContext<TestDBContext>(options => options.UseSqlServer(connection));
             services.AddDbContext<TestDBContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:DefaultConnection"]));
 
-            var key = Encoding.UTF8.GetBytes(appSettings.Secret);
-
             DependencyInjectionConfig.AddScope(services);
-            JwtConfig.AddJwtAuthentication(services, Configuration);
+            services.AddAuthentication(GetAuthenticationOptions).AddJwtBearer(GetJwtBearerOptions);
+            //JwtConfig.AddJwtAuthentication(services, Configuration);
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", p =>
+                {
+                    p.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, TestDBContext context)
         {
             if (env.IsDevelopment())
             {
@@ -82,14 +87,39 @@ namespace BloggerApp
                 cfg.CreateMap<ArticleCategory, ArticleCategoryDto>();
                 cfg.CreateMap<ArticleForCreationDto, Article>();
                 cfg.CreateMap<Article, ArticleDto>()
-                    .ForMember(a => a.FirstName, ex => ex.MapFrom(o => o.Author.FirstName))
-                    .ForMember(a => a.LastName, ex => ex.MapFrom(o => o.Author.LastName));
+                    .ForMember(dto => dto.FirstName, conf => conf.MapFrom(a => a.Author.FirstName))
+                    .ForMember(dto => dto.LastName, conf => conf.MapFrom(a => a.Author.LastName));
+                cfg.CreateMap<Article, UsersArticleDto>();
+                cfg.CreateMap<ArticleForUpdatingDto, Article>();
             });
             //app.ConfigureCustomExceptionMiddleware();
             app.UseCors("AllowAll");
             app.UseAuthentication();
+            //DbSeeder.seedDb(context);
+
             app.UseHttpsRedirection();
             app.UseMvc();
+        }
+
+        private void GetAuthenticationOptions(AuthenticationOptions options)
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        }
+
+        private void GetJwtBearerOptions(JwtBearerOptions options)
+        {
+            options.TokenValidationParameters = new TokenValidationParameters()
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = Configuration["Jwt:Issuer"],
+                ValidAudience = Configuration["Jwt:Audience"],
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:SecurityKey"]))
+            };
         }
     }
 }

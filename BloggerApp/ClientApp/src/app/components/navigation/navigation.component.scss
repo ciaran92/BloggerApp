@@ -1,3 +1,47 @@
+$primary-color: #AB3428;
+$normal-opacity: 0.6;
+$hover-opacity: 1;
+
+.navbar{
+    height: 52px;
+}
+
 .btn{
     margin-right: .5rem;
+}
+
+.btn-outline-success{
+    color: $primary-color;
+    border-color: $primary-color;
+    opacity: $normal-opacity;
+}
+
+.btn-outline-success:hover{
+    background-color: $primary-color;
+    color: #ffffff;
+}
+
+.logout{
+    cursor: pointer;
+    color: $primary-color !important;
+    opacity: $normal-opacity;
+    transition: 0.2s all;
+}
+
+.logout:hover{
+    opacity: $hover-opacity;
+}
+
+.grid-menu{
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    list-style: none;
+}
+
+.grid-menu a{
+    width: 100%;
+    height: 100%;
+    float: left;
+    background-image: url("../../../assets/grid-menu.png");
 }

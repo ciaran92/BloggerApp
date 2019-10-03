@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using BloggerApp.IntegrationTesting.Helpers;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.ViewComponents;
@@ -15,21 +16,22 @@ using System.Text;
 
 namespace BloggerApp.IntegrationTesting
 {
-    public class TestFixture<TStartup> : IDisposable
+    public class TestFixture<TStartup> : IDisposable where TStartup : class
     {
         private TestServer Server;
         public HttpClient Client { get; }
 
         public TestFixture()
         {
-            var configurationBuilder = new ConfigurationBuilder()
+            /*var configurationBuilder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json");
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .Build();*/
 
             var webHostBuilder = new WebHostBuilder()
-                .UseConfiguration(configurationBuilder.Build())
-                .UseEnvironment("Development")
-                .UseStartup(typeof(TStartup));
+                .UseStartup(typeof(TStartup))
+                .UseConfiguration(ConfigurationFactory.GetConfiguration());
 
             Server = new TestServer(webHostBuilder);
             Client = Server.CreateClient();

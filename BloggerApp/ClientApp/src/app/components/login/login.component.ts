@@ -22,7 +22,7 @@ export class LoginComponent implements OnInit {
     let loginCredentials = JSON.stringify(form.value);
     this.authService.login(loginCredentials).subscribe(result => {
       if(result) {
-          this.route.navigate(['/create-post']);
+          this.route.navigate(['/new-article']);
       }
     },
     error => {

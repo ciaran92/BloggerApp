@@ -5,6 +5,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { retry, map, catchError, tap } from 'rxjs/operators';
 import { Observable, throwError } from 'rxjs';
 import { Tokens } from '../models/tokens.model';
+import { JwtHelperService } from '@auth0/angular-jwt';
 
 @Injectable()
 export class AuthService {
@@ -54,7 +55,10 @@ export class AuthService {
     
     setCookies(tokens: Tokens){
         console.log('access token to set:');
-        console.log(tokens.accessToken);
+        //console.log(tokens.accessToken);
+        let helper = new JwtHelperService();
+        let decodedToken = helper.decodeToken(tokens.accessToken);
+        console.log("decoded token: " + JSON.stringify(decodedToken));
         this.cookie.set(this.AccessToken, tokens.accessToken);
     }
 

@@ -1,0 +1,17 @@
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+      <h1 class="display-4">My Articles</h1>
+      <p class="lead">List of all your Articles.</p>
+      <a class="btn btn-primary btn-sm" routerLink="/new-article" role="button">New Article</a>
+  </div>
+</div>
+<div class="container">
+  <div class="card w-100" *ngFor="let article of myArticles">
+      <div class="card-body">
+          <h5 class="card-title">{{ article.articleTitle }}</h5>
+          <p class="card-text">{{ article.articleBody | slice:0:300 }} ...</p>
+          <a (click)="editArticle(article.articleId)" class="card-link edit">Edit</a>
+          <a (click)="confirmDeleteArticle(article.articleId)" class="card-link delete">Delete</a>
+      </div>
+  </div>
+</div>

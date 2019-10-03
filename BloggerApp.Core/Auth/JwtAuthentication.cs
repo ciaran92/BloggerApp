@@ -2,6 +2,7 @@
 using BloggerApp.Data.Entities;
 using BloggerApp.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -17,15 +18,18 @@ namespace BloggerApp.Core.Auth
 
     public class JwtAuthentication : IJwtAuthentication
     {
-        private readonly AppSecrets _appSecrets;
         private readonly TestDBContext _context;
-        private readonly byte[] _secretKey;
 
-        public JwtAuthentication(TestDBContext context, IOptions<AppSecrets> appSecrets)
+        private readonly byte[] _secretKey;
+        private readonly string _validIssuer;
+        private readonly string _validAudience;
+
+        public JwtAuthentication(TestDBContext context, IConfiguration configuration)
         {
             _context = context;
-            _appSecrets = appSecrets.Value;
-            _secretKey = Encoding.UTF8.GetBytes(_appSecrets.Secret);
+            _secretKey = Encoding.UTF8.GetBytes(configuration["Jwt:SecurityKey"]);
+            _validIssuer = configuration["Jwt:Issuer"];
+            _validAudience = configuration["Jwt:Audience"];
         }
 
         public string CreateAccessToken(AppUser user)
@@ -73,8 +77,8 @@ namespace BloggerApp.Core.Auth
 
             var token = new JwtSecurityToken
             (
-                issuer: "http://localhost:52459",
-                audience: "http://localhost:52459",
+                issuer: _validIssuer,
+                audience: _validAudience,
                 expires: DateTime.Now.AddMinutes(30),
                 claims: claims,
                 signingCredentials: signInCred

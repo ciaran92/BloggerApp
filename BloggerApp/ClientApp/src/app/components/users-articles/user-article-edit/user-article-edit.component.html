@@ -1,0 +1,44 @@
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+      <h1 class="display-4">Edit Article</h1>
+  </div>
+</div>
+<div class="container">
+    <div class="card">
+
+        <form #form="ngForm" (ngSubmit)="editArticle()">
+
+            <!--Input Field(Edit Article Title)-->
+            <div class="form-group">
+                <label for="ArticleTitle">Change Article Title</label>
+                <input 
+                  value="{{ article?.articleTitle }}"
+                  name="articleTitle"
+                  [(ngModel)]="article.articleTitle"
+                  #articleTitle="ngModel"
+                  type="text" 
+                  class="form-control" 
+                  placeholder="Edit Title">
+            </div>
+
+            <!--Textarea(Edit Article Body)-->
+            <div class="form-group">
+                <label for="ArticleBody">Edit your Article</label>
+                <textarea 
+                  rows="30" 
+                  class="form-control" 
+                  name="articleBody" 
+                  [(ngModel)]="article.articleBody">
+                </textarea>
+            </div>
+
+            <!--Save Changes & Cancel Buttons-->
+            <div class="form-group edit-btns">
+                <button type="submit" class="btn btn-primary btn-block btn-save">Save Changes</button>
+                <button (click)="cancel()" class="btn btn-primary btn-block btn-cancel">Cancel</button>
+            </div>
+
+        </form>
+        
+    </div>
+</div>

@@ -54,6 +54,16 @@ namespace BloggerApp.Core.AppUsers.Services
             return user;
         }
 
+        public async Task<bool> CheckUserExistsAsync(int userId)
+        {
+            var user = await _context.AppUser.SingleOrDefaultAsync(x => x.AppUserId == userId);
+
+            if (user != null)
+                return true;
+
+            return false;
+        }
+
         private string CreateSalt()
         {
             byte[] salt = new byte[128 / 8];

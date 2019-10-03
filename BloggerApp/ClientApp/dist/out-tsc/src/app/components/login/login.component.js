@@ -16,7 +16,7 @@ var LoginComponent = /** @class */ (function () {
         var loginCredentials = JSON.stringify(form.value);
         this.authService.login(loginCredentials).subscribe(function (result) {
             if (result) {
-                _this.route.navigate(['/create-post']);
+                _this.route.navigate(['/new-article']);
             }
         }, function (error) {
             _this.error = error;

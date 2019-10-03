@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { ConfigService } from './config.service';
 import { CookieService } from 'ngx-cookie-service';
 import { map, tap } from 'rxjs/operators';
+import { JwtHelperService } from '@auth0/angular-jwt';
 var AuthService = /** @class */ (function () {
     function AuthService(http, configService, cookie) {
         this.http = http;
@@ -42,7 +43,10 @@ var AuthService = /** @class */ (function () {
     };
     AuthService.prototype.setCookies = function (tokens) {
         console.log('access token to set:');
-        console.log(tokens.accessToken);
+        //console.log(tokens.accessToken);
+        var helper = new JwtHelperService();
+        var decodedToken = helper.decodeToken(tokens.accessToken);
+        console.log("decoded token: " + JSON.stringify(decodedToken));
         this.cookie.set(this.AccessToken, tokens.accessToken);
     };
     AuthService.prototype.removeCookies = function () {

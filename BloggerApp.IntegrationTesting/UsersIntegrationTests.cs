@@ -1,7 +1,10 @@
+using BloggerApp.Data.Context;
 using BloggerApp.Data.Models;
 using BloggerApp.Data.Models.AppUser;
+using BloggerApp.IntegrationTesting.Helpers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.IO;
@@ -13,30 +16,23 @@ using Xunit;
 
 namespace BloggerApp.IntegrationTesting
 {
-    public class UsersIntegrationTests : IClassFixture<TestFixture<Startup>>
+    public class UsersIntegrationTests : IClassFixture<TestFixture<Startup>>, IClassFixture<DbContextFactory>, IDisposable
     {
         public HttpClient _client;
+        private readonly TestDBContext _context;
 
-        public UsersIntegrationTests(TestFixture<Startup> fixture)
+        public UsersIntegrationTests(TestFixture<Startup> fixture, DbContextFactory contextFactory)
         {
             _client = fixture.Client;
+            _context = contextFactory.Context;
+            _context.Database.ExecuteSqlCommand("begin tran");
         }
 
-        /*[Fact]
-        public async Task Test1()
-        {
-            var request = "/api/values";
-            
-            var response = await _client.GetAsync(request);
-
-            response.EnsureSuccessStatusCode();
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            //Assert.Equal(1, 1);
-        }*/
 
         [Fact]
         public async Task TestRegisterNewUserSuccessful()
         {
+            _context.Database.BeginTransaction();
             var response = await _client.PostAsync("/api/users/register", new StringContent(
                     JsonConvert.SerializeObject(
                     new UserForCreationDto()
@@ -56,7 +52,7 @@ namespace BloggerApp.IntegrationTesting
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
-        [Fact]
+        //[Fact]
         public async Task TestRegisterNewUserEmailAlreadyExists()
         {
             var response = await _client.PostAsync("/api/users/register", new StringContent(
@@ -77,7 +73,7 @@ namespace BloggerApp.IntegrationTesting
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
-        [Fact]
+        //[Fact]
         public async Task TestLoginUserCorrectCredentials()
         {
             var response = await _client.PostAsync("/api/users/login", new StringContent(
@@ -93,7 +89,7 @@ namespace BloggerApp.IntegrationTesting
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
-        [Fact]
+        //[Fact]
         public async Task TestLoginUserIncorrectPasswordReturnsBadRequest()
         {
             var response = await _client.PostAsync("/api/users/login", new StringContent(
@@ -109,7 +105,7 @@ namespace BloggerApp.IntegrationTesting
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
-        [Fact]
+        //[Fact]
         public async Task TestLoginUserIncorrectEmailReturnsBadRequest()
         {
             var response = await _client.PostAsync("/api/users/login", new StringContent(
@@ -123,6 +119,15 @@ namespace BloggerApp.IntegrationTesting
 
             //response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        public void Dispose()
+        {
+            _context.Database.ExecuteSqlCommand("rollback tran");
+            //_context.Database.RollbackTransaction();
+            //_context.Commit();
+            //_context.AppUser.RemoveRange(_context.AppUser);
+            //_context.SaveChanges();
         }
     }
 }

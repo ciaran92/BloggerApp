@@ -1,0 +1,28 @@
+$delete-color: #AB3428;
+$edit-color: #42858C;
+$normal-opacity: 0.8;
+$hover-opacity: 1;
+$transition: 0.2s all;
+
+.card{
+    margin-bottom: 2rem;
+}
+
+.card-link{
+    cursor: pointer;
+    transition: $transition;
+}
+
+.card-link.edit{
+    color: $edit-color !important;
+    opacity: $normal-opacity;
+}
+
+.card-link.delete{
+    color: $delete-color !important;
+    opacity: $normal-opacity;
+}
+
+.card-link:hover{
+    opacity: $hover-opacity;
+}
